@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Forum</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7fa;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .question-form, .answer-form {
+            margin-bottom: 20px;
+        }
+        .question-form input, .answer-form input, .question-form textarea, .answer-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .question-form button, .answer-form button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .question-form button:hover, .answer-form button:hover {
+            background-color: #0056b3;
+        }
+        .questions-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .question-item {
+            padding: 15px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .question-item h3 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+        .answer-section {
+            margin-top: 15px;
+        }
+        .answer-item {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Simple Forum: Ask & Answer Questions</h1>
+</header>
+
+<div class="container">
+
+    <!-- Question Form -->
+    <div class="question-form">
+        <h2>Post a New Question</h2>
+        <input type="text" id="question-title" placeholder="Enter your question title" required>
+        <textarea id="question-body" rows="4" placeholder="Describe your question in detail" required></textarea>
+        <button onclick="postQuestion()">Post Question</button>
+    </div>
+
+    <!-- List of Questions -->
+    <ul class="questions-list" id="questions-list">
+        <!-- Questions will be dynamically added here -->
+    </ul>
+</div>
+
+<script>
+    let questions = []; // Array to hold questions and answers data
+
+    // Function to post a new question
+    function postQuestion() {
+        const questionTitle = document.getElementById("question-title").value.trim();
+        const questionBody = document.getElementById("question-body").value.trim();
+
+        if (questionTitle && questionBody) {
+            const newQuestion = {
+                id: questions.length + 1,
+                title: questionTitle,
+                body: questionBody,
+                answers: []
+            };
+
+            questions.push(newQuestion);
+            renderQuestions();
+            clearForm();
+        } else {
+            alert("Please provide both a question title and description.");
+        }
+    }
+
+    // Function to render the list of questions
+    function renderQuestions() {
+        const questionsList = document.getElementById("questions-list");
+        questionsList.innerHTML = '';
+
+        questions.forEach(question => {
+            const questionItem = document.createElement('li');
+            questionItem.classList.add('question-item');
+            
+            const questionTitle = document.createElement('h3');
+            questionTitle.innerText = question.title;
+            questionItem.appendChild(questionTitle);
+
+            const questionBody = document.createElement('p');
+            questionBody.innerText = question.body;
+            questionItem.appendChild(questionBody);
+
+            // Answer Form
+            const answerForm = document.createElement('div');
+            answerForm.classList.add('answer-form');
+            const answerTextarea = document.createElement('textarea');
+            answerTextarea.placeholder = "Write your answer here...";
+            answerForm.appendChild(answerTextarea);
+
+            const answerButton = document.createElement('button');
+            answerButton.innerText = "Post Answer";
+            answerButton.onclick = () => postAnswer(question.id, answerTextarea.value);
+            answerForm.appendChild(answerButton);
+
+            questionItem.appendChild(answerForm);
+
+            // Answers Section
+            const answerSection = document.createElement('div');
+            answerSection.classList.add('answer-section');
+            question.answers.forEach(answer => {
+                const answerItem = document.createElement('div');
+                answerItem.classList.add('answer-item');
+                answerItem.innerText = answer;
+                answerSection.appendChild(answerItem);
+            });
+
+            questionItem.appendChild(answerSection);
+
+            questionsList.appendChild(questionItem);
+        });
+    }
+
+    // Function to post an answer to a question
+    function postAnswer(questionId, answerText) {
+        if (answerText.trim()) {
+            const question = questions.find(q => q.id === questionId);
+            question.answers.push(answerText.trim());
+            renderQuestions();
+        } else {
+            alert("Please write an answer.");
+        }
+    }
+
+    // Clear form after submitting a question
+    function clearForm() {
+        document.getElementById("question-title").value = '';
+        document.getElementById("question-body").value = '';
+    }
+</script>
+
+</body>
+</html>
